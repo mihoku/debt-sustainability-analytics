@@ -69,7 +69,7 @@ def update_graph_projection_track_record(group):
         l=0,
         r=0,
         b=0,
-        t=100,
+        t=50,
         pad=4)
     )
     
@@ -117,7 +117,7 @@ def update_graph_projection_track_record(group):
         l=0,
         r=0,
         b=0,
-        t=100,
+        t=50,
         pad=4))
     
     chart_PB = go.Figure()
@@ -163,7 +163,7 @@ def update_graph_projection_track_record(group):
         l=0,
         r=0,
         b=0,
-        t=100,
+        t=50,
         pad=4))
     
     return chart_PB, chart_Inflation, chart_GDP
