@@ -12,6 +12,7 @@ import pathlib
 import json
 import numpy as np
 from basic1 import BASIC1
+from basic2 import BASIC2
 from realism import REALISM
 
 PATH = pathlib.Path(__file__).parent
@@ -21,22 +22,7 @@ OTHER_PATH = PATH.joinpath("other-datasets").resolve()
 df = pd.read_csv(DATA_PATH.joinpath('change in debt.csv'),low_memory=False, sep=";", header=0)
 x = df['Tahun']
 
-BASIC2 = dbc.Container(
-    [
-        dbc.Row([dbc.Col(dbc.Card()),], style={"marginTop": 30}),
-        dbc.Row([dbc.Col(dbc.Card()),], style={"marginTop": 30}),
-        #dbc.Row(
-            #[
-               # dbc.Col(LEFT_COLUMN, md=4, align="center"),
-                #dbc.Col(dbc.Card(TOP_BANKS_PLOT), md=8),
-            #],
-            #style={"marginTop": 30},
-        #),
-        #dbc.Card(),
-        #dbc.Row([dbc.Col([dbc.Card()])], style={"marginTop": 50}),
-    ],
-    className="mt-12",
-)
+
 
 layout1 = html.Div(children=[BASIC1])
 layout2 = html.Div(children=[BASIC2])
