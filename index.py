@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
 from app import app
-from layouts import layout1, layout2, layout3, layout4, layout5
+from layouts import layout0, layout1, layout2, layout3, layout4, layout5
 import callbacks
 
 PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
@@ -15,7 +15,7 @@ app.layout = html.Div([
         dbc.DropdownMenu(
             children=[
                 dbc.DropdownMenuItem("Basic DSA", header=True),
-                dbc.DropdownMenuItem("Baseline Scenario", href="/"),
+                dbc.DropdownMenuItem("Baseline Scenario", href="/baseline-scenario"),
                 dbc.DropdownMenuItem("Public Debt Composition and Alt. Scenario", href="/public-debt-composition-and-alternative-scenario"),
             ],
             nav=True,
@@ -43,6 +43,8 @@ app.layout = html.Div([
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/':
+        return layout0
+    elif pathname == '/baseline-scenario':
         return layout1
     elif pathname == '/public-debt-composition-and-alternative-scenario':
         return layout2

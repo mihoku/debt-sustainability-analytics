@@ -18,11 +18,28 @@ from realism import REALISM
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data-source").resolve()
 OTHER_PATH = PATH.joinpath("other-datasets").resolve()
+ASSETS_PATH = PATH.joinpath("assets").resolve()
 
 df = pd.read_csv(DATA_PATH.joinpath('change in debt.csv'),low_memory=False, sep=";", header=0)
 x = df['Tahun']
 
+layout0 = dbc.Jumbotron(
+    [
+     html.Center([
+         html.Img(src="https://upload.wikimedia.org/wikipedia/commons/7/73/Logo_kementerian_keuangan_republik_indonesia.png", style=dict(width=150)),   
+         html.H1("Debt Sustainability Analytics", className="display-3"),
+         html.P(
+            "Analisis atas kesinambungan utang Pemerintah",
+            className="lead",
+            ),
+         html.Hr(className="my-2"),
+         html.P(
+            "Mengacu pada Framework DSA IMF 2013"
+            ),
+         html.P(html.A(dbc.Button("Get Started", color="primary"), href='/baseline-scenario'), className="lead"),         
+         ])
 
+    ])
 
 layout1 = html.Div(children=[BASIC1])
 layout2 = html.Div(children=[BASIC2])
