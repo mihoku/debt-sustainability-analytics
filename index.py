@@ -9,8 +9,6 @@ import callbacks
 
 PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
 
-
-
 app.layout = html.Div([
     dbc.NavbarSimple(
     children=[
