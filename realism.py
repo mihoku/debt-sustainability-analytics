@@ -159,7 +159,7 @@ gdp_data['Output Gap'] = (gdp_data['Real GDP (constant prices)']-gdp_data['Poten
 
 gdp_filtered = gdp_data.loc[(gdp_data['Tahun']>=date.today().year-5)&(gdp_data['Tahun']<=date.today().year+5)]
 gdp_filtered.sort_values('Tahun')
-gdp_filtered['plot_marks'] = pd.Series(plot_markers)
+gdp_filtered['plot_marks'] = plot_markers
 gdp_filtered['Real GDP Growth'] = gdp_filtered['Real GDP (constant prices)']/gdp_filtered['Real GDP (constant prices) t-1']-1
 gdp_filtered['Real GDP Growth (percentage)'] = gdp_filtered['Real GDP Growth']*100
 
