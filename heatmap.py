@@ -26,6 +26,8 @@ debt_profile_data['y'] = 100*debt_profile_data['t-1']/debt_profile_data['Full']
 debt_profile_data['bar_width'] = 0.8
 max_point = round(debt_profile_data['y'].max()*1.2,0)
 
+debt_profile_criteria = pd.read_csv(DATA_PATH.joinpath('debt-profile-criteria.csv'),low_memory=False, sep=";", header=0)
+
 debt_risk=['Real GDP Growth Shock','Primary Balance Shock','Real Interest Rate Shock','Exchange Rate Shock','Contingent Liability shock']
 
 heatmap_risk = go.Figure(data=go.Heatmap(
@@ -423,7 +425,7 @@ RISK_HEATMAP = dbc.Card([
                     html.P(""),
                     html.P("Risiko dipandang rendah jika benchmark beban utang, yaitu 70% dari GDP, tidak akan terlampaui dalam kondisi shock tertentu yang menjadi baseline. Risiko sedang jika benchmark beban utang terlampaui dalam kondisi shock tertentu, namun bukan kondisi yang menjadi baseline. Risiko tinggi, jika benchmark beban utang terlampaui dalam kondisi baseline. Heatmap juga dapat diwarnai putih jika tidak relevan.")
                     ])
-                ],md=4),
+                ],md=6),
             dbc.Col([
                 dbc.CardHeader(html.Center(html.H5("Gross Financing Needs"))),
                 dbc.CardBody([
@@ -431,17 +433,25 @@ RISK_HEATMAP = dbc.Card([
                     html.P(""),
                     html.P("Risiko dipandang rendah jika benchmark kebutuhan pembiayaan bruto, yaitu 15% dari GDP, tidak akan terlampaui dalam kondisi shock tertentu yang menjadi baseline. Risiko sedang jika benchmark kebutuhan pembiayaan bruto terlampaui dalam kondisi shock tertentu, namun bukan kondisi yang menjadi baseline. Risiko tinggi, jika benchmark kebutuhan pembiayaan bruto terlampaui dalam kondisi baseline. Heatmap juga dapat diwarnai putih jika tidak relevan.")
                     ])
-                ],md=4),
+                ],md=6),
+            ]
+        ),
+        dbc.Row(
             dbc.Col([
                 dbc.CardHeader(html.Center(html.H5("Debt Profile"))),
                 dbc.CardBody([
                     html.P("Merupakan risiko kesinambungan utang jika ditimbang berdasarkan profil utangnya."),
                     html.P(""),
-                    html.P("Terdapat 5 risiko terkait profil utang, yakni bond spreads, kebutuhan pendanaan eksternal, porsi utang publik dalam mata uang asing, perubahan porsi utang jangka pendek, serta porsi utang publik yang dipegang oleh non residen. Kriteria masing-masing risiko dapat dilihat pada bagian Debt Profile Vulnerabilities.")
+                    html.P("Terdapat 5 risiko terkait profil utang, yakni bond spreads, kebutuhan pendanaan eksternal, porsi utang publik dalam mata uang asing, perubahan porsi utang jangka pendek, serta porsi utang publik yang dipegang oleh non residen. Kriteria masing-masing risiko adalah sebagai berikut:"),
+                    dash_table.DataTable(
+                        columns=[
+                            {"name": i, "id": i, "deletable": True, "selectable": True} for i in debt_profile_criteria.columns
+                            ],
+                        data=debt_profile_criteria.to_dict('records'),
+                        ),
                     ])
-                ],md=4),
-            ]
-        ),
+                ],md=12),
+            )
         ],
         style={"marginTop": 0, "marginBottom": 0},
     ),
