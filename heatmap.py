@@ -17,12 +17,167 @@ PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data-source").resolve()
 OTHER_PATH = PATH.joinpath("other-datasets").resolve()
 
+heatmap_data = [[.5, 1, .5, 1, 1],
+        [.5, 0, .5, 1, .5],
+        [.5, 1, .5, .5, 0]]
+
 debt_profile_data = pd.read_csv(DATA_PATH.joinpath('debt-profile-benchmark-and-data.csv'),low_memory=False, sep=";", header=0)
 debt_profile_data['y'] = 100*debt_profile_data['t-1']/debt_profile_data['Full']
 debt_profile_data['bar_width'] = 0.8
 max_point = round(debt_profile_data['y'].max()*1.2,0)
 
-debt_profile_data_bond_spread = debt_profile_data[debt_profile_data['Name']=='Bond spread']
+debt_risk=['Real GDP Growth Shock','Primary Balance Shock','Real Interest Rate Shock','Exchange Rate Shock','Contingent Liability shock']
+
+heatmap_risk = go.Figure(data=go.Heatmap(
+                    z=heatmap_data,
+                    colorscale=[[0, 'green'],[0.5, 'orange'],[1, 'firebrick']]))
+
+#add bar name below
+heatmap_risk.add_annotation(x=0, y=0,
+                              xanchor='center', yanchor='top',
+                              text=debt_profile_data.iloc[0]['Name'],
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+
+
+heatmap_risk.add_annotation(x=1, y=0.2,
+                              xanchor='center', yanchor='top',
+                              text='External Financing',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+heatmap_risk.add_annotation(x=1, y=0,
+                              xanchor='center', yanchor='top',
+                              text='Requirement',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+
+heatmap_risk.add_annotation(x=2, y=0.4,
+                              xanchor='center', yanchor='top',
+                              text="Annual Change",
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+heatmap_risk.add_annotation(x=2, y=0.2,
+                              xanchor='center', yanchor='top',
+                              text="in Short-Term",
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+heatmap_risk.add_annotation(x=2, y=0,
+                              xanchor='center', yanchor='top',
+                              text="Public Debt",
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+
+heatmap_risk.add_annotation(x=3, y=0.2,
+                              xanchor='center', yanchor='top',
+                              text='Public Debt Held',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+heatmap_risk.add_annotation(x=3, y=0,
+                              xanchor='center', yanchor='top',
+                              text='by Non-Residents',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+
+heatmap_risk.add_annotation(x=4, y=0.2,
+                              xanchor='center', yanchor='top',
+                              text='Public Debt',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+heatmap_risk.add_annotation(x=4, y=0,
+                              xanchor='center', yanchor='top',
+                              text='in Foreign Currency',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+
+for x in range(0,5):
+    for y in range(0,2):
+        heatmap_risk.add_annotation(x=x, y=y+1,
+                              xanchor='center', yanchor='top',
+                              text=debt_risk[x],
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#fff'),
+                              showarrow=False)
+
+for i in range(0,5):
+    for j in range(0,3):    
+        #rectangles
+        heatmap_risk.add_trace(go.Scatter(x=[i-.5,i-.5,i+.5,i+.5,i-.5], y=[j-.5,j+.5,j+.5,j-.5,j-.5], mode='lines',
+                                          line=dict(color='black', width=2),
+                                          connectgaps=True, hovertemplate=''
+                                          ))
+
+heatmap_risk.add_annotation(y=0, x=-0.5,
+                              xanchor='right',
+                              text='Debt Profile',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#000'),
+                              showarrow=False)
+
+heatmap_risk.add_annotation(y=1, x=-0.5,
+                              xanchor='right',
+                              text='Gross Financing Needs',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#000'),
+                              showarrow=False)
+
+heatmap_risk.add_annotation(y=2, x=-0.5,
+                              xanchor='right',
+                              text='Debt Level',
+                              font=dict(family='Arial',
+                                        size=14,
+                                        color='#000'),
+                              showarrow=False)
+
+heatmap_risk.update_layout(
+    xaxis=dict(
+        showgrid=False,
+        zeroline=False,
+        showline=False,
+        showticklabels=False,
+    ),
+    yaxis=dict(
+        showgrid=False,
+        zeroline=False,
+        showline=False,
+        showticklabels=False,
+    ),
+#    autosize=False,
+    margin=dict(
+#        autoexpand=False,
+        l=0,
+        r=0,
+        t=0,
+        b=0
+    ),
+    showlegend=False,
+    plot_bgcolor='white',
+    hovermode=False
+)
+
+########################debt profile vulnerabilities
 
 debt_profile_vuln = go.Figure()
 
@@ -251,6 +406,47 @@ debt_profile_vuln.update_layout(
     hovermode=False
 )
 
+RISK_HEATMAP = dbc.Card([
+    dbc.CardHeader(html.Center(html.H5("Heat Map"))),
+    dbc.CardBody([dbc.Row(
+        [
+            dbc.Col(dcc.Graph(figure=heatmap_risk),md=12)
+           ] 
+        ),
+        html.P(""),
+        dbc.Row(
+        [
+            dbc.Col([
+                dbc.CardHeader(html.Center(html.H5("Debt Level Risks"))),
+                dbc.CardBody([
+                    html.P("Merupakan sensitifitas tingkat utang eksisting terhadap adanya shock pada indikator makroekonomi yang meliputi pertumbuhan GDP, keseimbangan primer, tingkat suku bunga riil, nilai tukar mata uang, dan kewajiban kontinjensi."),
+                    html.P(""),
+                    html.P("Risiko dipandang rendah jika benchmark beban utang, yaitu 70% dari GDP, tidak akan terlampaui dalam kondisi shock tertentu yang menjadi baseline. Risiko sedang jika benchmark beban utang terlampaui dalam kondisi shock tertentu, namun bukan kondisi yang menjadi baseline. Risiko tinggi, jika benchmark beban utang terlampaui dalam kondisi baseline. Heatmap juga dapat diwarnai putih jika tidak relevan.")
+                    ])
+                ],md=4),
+            dbc.Col([
+                dbc.CardHeader(html.Center(html.H5("Gross Financing Needs"))),
+                dbc.CardBody([
+                    html.P("Merupakan sensitifitas kebutuhan pembiayaan bruto terhadap adanya shock pada indikator makroekonomi yang meliputi pertumbuhan GDP, keseimbangan primer, tingkat suku bunga riil, nilai tukar mata uang, dan kewajiban kontinjensi."),
+                    html.P(""),
+                    html.P("Risiko dipandang rendah jika benchmark kebutuhan pembiayaan bruto, yaitu 15% dari GDP, tidak akan terlampaui dalam kondisi shock tertentu yang menjadi baseline. Risiko sedang jika benchmark kebutuhan pembiayaan bruto terlampaui dalam kondisi shock tertentu, namun bukan kondisi yang menjadi baseline. Risiko tinggi, jika benchmark kebutuhan pembiayaan bruto terlampaui dalam kondisi baseline. Heatmap juga dapat diwarnai putih jika tidak relevan.")
+                    ])
+                ],md=4),
+            dbc.Col([
+                dbc.CardHeader(html.Center(html.H5("Debt Profile"))),
+                dbc.CardBody([
+                    html.P("Merupakan risiko kesinambungan utang jika ditimbang berdasarkan profil utangnya."),
+                    html.P(""),
+                    html.P("Terdapat 5 risiko terkait profil utang, yakni bond spreads, kebutuhan pendanaan eksternal, porsi utang publik dalam mata uang asing, perubahan porsi utang jangka pendek, serta porsi utang publik yang dipegang oleh non residen. Kriteria masing-masing risiko dapat dilihat pada bagian Debt Profile Vulnerabilities.")
+                    ])
+                ],md=4),
+            ]
+        ),
+        ],
+        style={"marginTop": 0, "marginBottom": 0},
+    ),
+])
+
 DEBT_PROFILE_VULNERABILITIES = dbc.Card([
     dbc.CardHeader(html.Center(html.H5("Debt Profile Vulnerabilities"))),
     dbc.CardBody([dbc.Row(
@@ -265,12 +461,12 @@ DEBT_PROFILE_VULNERABILITIES = dbc.Card([
 
 HEATMAP = dbc.Container(
     [
+     dbc.Row(dbc.Col(RISK_HEATMAP,md=12), style={"marginTop": 50,"marginBottom": 50}),
      dbc.Row(
          [
              dbc.Col(md=6),
              dbc.Col(md=6)
           ], style={"marginTop": 50,"marginBottom": 50}),
-     dbc.Row(dbc.Col(md=12), style={"marginTop": 50,"marginBottom": 50}),
      dbc.Row(dbc.Col(DEBT_PROFILE_VULNERABILITIES,md=12), style={"marginTop": 50,"marginBottom": 50})
     ],
     className="mt-12",
