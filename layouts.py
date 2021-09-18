@@ -29,7 +29,7 @@ layout0 = dbc.Jumbotron(
          html.Img(src="https://upload.wikimedia.org/wikipedia/commons/7/73/Logo_kementerian_keuangan_republik_indonesia.png", style=dict(width=150)),   
          html.H1("Debt Sustainability Analytics", className="display-3"),
          html.P(
-            "Analisis atas kesinambungan utang Pemerintah",
+            "Analisis atas kesinambungan utang publik",
             className="lead",
             ),
          html.Hr(className="my-2"),
