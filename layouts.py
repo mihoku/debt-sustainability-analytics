@@ -14,6 +14,7 @@ import numpy as np
 from basic1 import BASIC1
 from basic2 import BASIC2
 from realism import REALISM
+from heatmap import HEATMAP
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data-source").resolve()
@@ -45,7 +46,7 @@ layout1 = html.Div(children=[BASIC1])
 layout2 = html.Div(children=[BASIC2])
 layout3 = html.Div(children=[REALISM])
 layout4 = html.Div(children=[BASIC2])
-layout5 = html.Div(children=[BASIC2])
+layout5 = html.Div(children=[HEATMAP])
      
 #layout1 = html.Div([
 #    html.Div([
