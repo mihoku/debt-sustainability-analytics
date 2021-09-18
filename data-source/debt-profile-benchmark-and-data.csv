@@ -1,0 +1,6 @@
+Name;Benchmark;Metrics;Full;25;75;x;t-1;satuan
+Bond spread;EMBI Global spreads or Spread over US bonds for AEs. 3-month avg;In basis points;800;200;600;3;273;bps
+External Financing Requirement;External Financing Requirement;In percent of GDP;20;5;15;7;51.13878161;%
+Annual Change in Short-Term Public Debt;Annual Change in Share of Short-Term Public Debt at Original Maturity;In percent of total Public Debt;1.5;0.5;1;11;0.783935908;%
+Public Debt Held by Non-Residents;Public Debt Held by Non-Residents;In percent of total Public Debt;60;15;45;15;33.39430476;%
+Public Debt in Foreign Currency;Public Debt in Foreign Currency;In percent of total Public Debt;80;20;60;19;12.8991995;%
