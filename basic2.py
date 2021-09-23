@@ -17,13 +17,55 @@ PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data-source").resolve()
 OTHER_PATH = PATH.joinpath("other-datasets").resolve()
 
-df = pd.read_csv(DATA_PATH.joinpath('debt maturity.csv'),low_memory=False, sep=";", header=0)
-df2 = pd.read_csv(DATA_PATH.joinpath('debt currency.csv'),low_memory=False, sep=";", header=0)
-x = df['Tahun']
+df = pd.read_csv(DATA_PATH.joinpath('debt-composition.csv'),low_memory=False, sep=";", header=0)
+x = df['Year']
 
+#baseline scenario
+underlying_assumptions = pd.read_csv(DATA_PATH.joinpath('baseline-scenario.csv'),low_memory=False, sep=";", header=0)
+underlying_assumptions['Real GDP Growth'] = round((underlying_assumptions['GDP Constant Price']/underlying_assumptions['GDP Constant Price (t-1)']-1)*100,2)
+underlying_assumptions['Inflation'] = round((underlying_assumptions['GDP Deflator']/underlying_assumptions['GDP Deflator (t-1)']-1)*100,2)
+underlying_assumptions['Primary Balance'] = round(((underlying_assumptions['Public sector non-interest revenues']/underlying_assumptions['GDP Current Price'])-(underlying_assumptions['Public sector non-interest expenditures']/underlying_assumptions['GDP Current Price']))*100,2)
+underlying_assumptions['Effective Interest Rate'] = round((underlying_assumptions['Interest Payment']/(underlying_assumptions['Debt  t-1']+underlying_assumptions['New Debt']))*100,2)
+
+abase = underlying_assumptions[['Real GDP Growth','Inflation','Primary Balance','Effective Interest Rate']]
+index_ = ['2021','2022','2023','2024','2025','2026']
+abase.index = index_
+baseline_assumptions = abase.transpose()
+baseline_assumptions.reset_index(inplace=True)
+baseline_assumptions = baseline_assumptions.rename(columns = {'index':''})
+
+#historical scenario
+underlying_assumptions_historical = pd.read_csv(DATA_PATH.joinpath('historical-scenario.csv'),low_memory=False, sep=";", header=0)
+
+underlying_assumptions_historical['Real GDP Growth'] = round((underlying_assumptions_historical['GDP Constant Price']/underlying_assumptions_historical['GDP Constant Price (t-1)']-1)*100,2)
+underlying_assumptions_historical['Inflation'] = round((underlying_assumptions_historical['GDP Deflator']/underlying_assumptions_historical['GDP Deflator (t-1)']-1)*100,2)
+underlying_assumptions_historical['Primary Balance'] = round(((underlying_assumptions_historical['Public sector non-interest revenues']/underlying_assumptions_historical['GDP Current Price'])-(underlying_assumptions_historical['Public sector non-interest expenditures']/underlying_assumptions_historical['GDP Current Price']))*100,2)
+underlying_assumptions_historical['Effective Interest Rate'] = round((underlying_assumptions_historical['Interest Payment']/(underlying_assumptions_historical['Debt  t-1']+underlying_assumptions_historical['New Debt']))*100,2)
+
+ahist = underlying_assumptions_historical[['Real GDP Growth','Inflation','Primary Balance','Effective Interest Rate']]
+ahist.index = index_
+historical_assumptions = ahist.transpose()
+historical_assumptions.reset_index(inplace=True)
+historical_assumptions = historical_assumptions.rename(columns = {'index':''})
+
+#constant primary balance
+underlying_assumptions_pb = pd.read_csv(DATA_PATH.joinpath('primary-balance-scenario.csv'),low_memory=False, sep=";", header=0)
+
+underlying_assumptions_pb['Real GDP Growth'] = round((underlying_assumptions_pb['GDP Constant Price']/underlying_assumptions_pb['GDP Constant Price (t-1)']-1)*100,2)
+underlying_assumptions_pb['Inflation'] = round((underlying_assumptions_pb['GDP Deflator']/underlying_assumptions_pb['GDP Deflator (t-1)']-1)*100,2)
+underlying_assumptions_pb['Primary Balance'] = round(((underlying_assumptions_pb['Public sector non-interest revenues']/underlying_assumptions_pb['GDP Current Price'])-(underlying_assumptions_pb['Public sector non-interest expenditures']/underlying_assumptions_pb['GDP Current Price']))*100,2)
+underlying_assumptions_pb['Effective Interest Rate'] = round((underlying_assumptions_pb['Interest Payment']/(underlying_assumptions_pb['Debt  t-1']+underlying_assumptions_pb['New Debt']))*100,2)
+
+abalance = underlying_assumptions_pb[['Real GDP Growth','Inflation','Primary Balance','Effective Interest Rate']]
+abalance.index = index_
+balance_assumptions = abalance.transpose()
+balance_assumptions.reset_index(inplace=True)
+balance_assumptions = balance_assumptions.rename(columns = {'index':''})
+
+#debt composition chart
 composition_of_public_debt = go.Figure()
 composition_of_public_debt.add_trace(go.Scatter(
-    x=x, y=df['Short Term'],
+    x=x, y=(df['Short Term Old Debt']+df['Short Term New Debt'])/df['GDP at current prices']*100,
     hoverinfo='x+y',
     mode='lines',
     line=dict(width=0.2, color='rgb(250, 0, 0)'),
@@ -31,7 +73,7 @@ composition_of_public_debt.add_trace(go.Scatter(
     name='Short Term'
 ))
 composition_of_public_debt.add_trace(go.Scatter(
-    x=x, y=df['Long Term'],
+    x=x, y=(df['Long Term Old Debt']+df['Long Term New Debt'])/df['GDP at current prices']*100,
     hoverinfo='x+y',
     mode='lines',
     line=dict(width=0.2, color='rgb(37, 47, 255)'),
@@ -55,8 +97,8 @@ composition_of_public_debt.update_layout(height=500)
 composition_of_public_debt.update_layout(barmode='relative', 
                                   colorway=px.colors.qualitative.Vivid, 
                                   title=dict(
-                                      text="By Maturity (in Percent of GDP)",
-                                      pad_t=0,
+                                      text="Composition of Public Debt by Currency (in Percent of GDP)",
+                                      pad_t=30,
                                       pad_b=50,
                                       yanchor="top",
                                       y=1
@@ -72,27 +114,28 @@ composition_of_public_debt.update_layout(barmode='relative',
                                       l=30,
                                       r=30,
                                       b=50,
-                                      t=50,
+                                      t=90,
                                       pad=2))
 
 composition_of_public_debt_by_currency = go.Figure()
 composition_of_public_debt_by_currency.add_trace(go.Scatter(
-    x=x, y=df2['Local'],
+    x=x, y=(df['Local Currency Old Debt']+df['Local Currency New Debt'])/df['GDP at current prices']*100,
     hoverinfo='x+y',
     mode='lines',
-    line=dict(width=0.2, color='rgb(255, 140, 0)'),
+    line=dict(width=0.2, color='rgb(0, 255, 51)'),
     stackgroup='one', # define stack group
     name='Local Currency'
 ))
 composition_of_public_debt_by_currency.add_trace(go.Scatter(
-    x=x, y=df2['Foreign'],
+    x=x, y=(df['Foreign Currency Old Debt']+df['Foreign Currency New Debt'])/df['GDP at current prices']*100,
     hoverinfo='x+y',
     mode='lines',
-    line=dict(width=0.2, color='rgb(0,128, 0)'),
+    line=dict(width=0.2, color='rgb(255, 174, 0)'),
     stackgroup='one',
     name='Foreign Currency'
 ))
 
+composition_of_public_debt_by_currency.show()
 
 composition_of_public_debt_by_currency.add_vrect(
     x0="2021", x1="2026",
@@ -108,8 +151,8 @@ composition_of_public_debt_by_currency.update_layout(height=500)
 composition_of_public_debt_by_currency.update_layout(barmode='relative', 
                                   colorway=px.colors.qualitative.Vivid, 
                                   title=dict(
-                                      text="By Currency (in Percent of GDP)",
-                                      pad_t=0,
+                                      text="Composition of Public Debt by Currency (in Percent of GDP)",
+                                      pad_t=30,
                                       pad_b=50,
                                       yanchor="top",
                                       y=1
@@ -125,7 +168,7 @@ composition_of_public_debt_by_currency.update_layout(barmode='relative',
                                       l=30,
                                       r=30,
                                       b=50,
-                                      t=50,
+                                      t=90,
                                       pad=2))
 
 ##########gross debt
@@ -249,6 +292,123 @@ BASIC2 = dbc.Container([
                 dbc.CardBody([
                     dbc.Row([dbc.Col(dcc.Graph(figure = gross_debt), md=6),dbc.Col(dcc.Graph(figure = financing_need), md=6)], style={"marginTop": 30}),
                     dbc.Row([dbc.Col(dbc.Card()),], style={"marginTop": 30}),])
-                ])],
+                ]),
+        dbc.Card(
+            [
+                dbc.CardHeader(html.Center(html.H4("Underlying Assumptions"))),
+                dbc.CardBody([
+                    dbc.Row([
+                        dbc.Col(
+                            dbc.Card([
+                                dbc.CardHeader(html.Center("Baseline Scenario")),
+                                dbc.CardBody(
+                                    dash_table.DataTable(
+                                        columns=[{"name": str(i), "id": str(i)} for i in baseline_assumptions.columns],
+                                        data=baseline_assumptions.to_dict('records'),
+    
+                                        style_cell_conditional=[
+                                            {'if': {'column_id': ''},
+                                             'width': '22%','textAlign': 'left'},
+                                            {'if': {'column_id': '2021'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2022'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2023'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2024'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2025'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2026'},
+                                             'width': '16%','textAlign': 'center'}
+                                            ],
+    
+                                        style_as_list_view=True,
+                                        style_cell={'padding': '5px', 'font-size':'12px'},
+                                        style_header={
+                                            'backgroundColor': 'navy',
+                                            'fontWeight': 'bold',
+                                            'color': 'white'
+                                            }
+                                        )
+                                    )
+                                ])
+                            ,md=6),
+                        dbc.Col(
+                            dbc.Card([
+                                dbc.CardHeader(html.Center("Historical Scenario")),
+                                dbc.CardBody(
+                                    dash_table.DataTable(
+                                        columns=[{"name": str(i), "id": str(i)} for i in historical_assumptions.columns],
+                                        data=historical_assumptions.to_dict('records'),
+    
+                                        style_cell_conditional=[
+                                            {'if': {'column_id': ''},
+                                             'width': '22%','textAlign': 'left'},
+                                            {'if': {'column_id': '2021'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2022'},
+                                                 'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2023'},
+                                             'width': '16%','textAlign': 'center'},
+                                                {'if': {'column_id': '2024'},
+                                                 'width': '16%','textAlign': 'center'},
+                                                    {'if': {'column_id': '2025'},
+                                                     'width': '16%','textAlign': 'center'},
+                                                    {'if': {'column_id': '2026'},
+                                                     'width': '16%','textAlign': 'center'}
+                                                    ],
+    
+                                        style_as_list_view=True,
+                                        style_cell={'padding': '5px', 'font-size':'12px'},
+                                        style_header={
+                                            'backgroundColor': 'navy',
+                                            'fontWeight': 'bold',
+                                            'color': 'white'
+                                            }   
+                                        )   
+                                    )
+                                ])
+                            ,md=6)
+                        ], style={"marginTop": 30}),
+                    dbc.Row([
+                        dbc.Col(md=3),
+                        dbc.Col(
+                            dbc.Card([
+                                dbc.CardHeader(html.Center("Constant Primary Balance Scenario")),
+                                dbc.CardBody(
+                                    dash_table.DataTable(
+                                        columns=[{"name": str(i), "id": str(i)} for i in balance_assumptions.columns],
+                                        data=balance_assumptions.to_dict('records'),    
+                                        style_cell_conditional=[
+                                            {'if': {'column_id': ''},
+                                             'width': '22%','textAlign': 'left'},
+                                            {'if': {'column_id': '2021'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2022'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2023'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2024'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2025'},
+                                             'width': '16%','textAlign': 'center'},
+                                            {'if': {'column_id': '2026'},
+                                             'width': '16%','textAlign': 'center'}
+                                            ],
+                                        style_as_list_view=True,
+                                        style_cell={'padding': '5px', 'font-size':'12px'},
+                                        style_header={
+                                            'backgroundColor': 'navy',
+                                            'fontWeight': 'bold',
+                                            'color': 'white'
+                                            }
+                                        )
+                                    )
+                                ])
+                            ,md=6)
+                        ], style={"marginTop": 30})
+                ])
+            ]),],
     className="mt-12", style={"marginTop": 50,"marginBottom": 50}
 )
