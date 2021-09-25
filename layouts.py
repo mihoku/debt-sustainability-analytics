@@ -15,6 +15,7 @@ from basic1 import BASIC1
 from basic2 import BASIC2
 from realism import REALISM
 from heatmap import HEATMAP
+from Stress_Tests import STRESS_TEST
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data-source").resolve()
@@ -45,7 +46,7 @@ layout0 = dbc.Jumbotron(
 layout1 = html.Div(children=[BASIC1])
 layout2 = html.Div(children=[BASIC2])
 layout3 = html.Div(children=[REALISM])
-layout4 = html.Div(children=[BASIC2])
+layout4 = html.Div(children=[STRESS_TEST])
 layout5 = html.Div(children=[HEATMAP])
      
 #layout1 = html.Div([

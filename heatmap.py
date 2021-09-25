@@ -17,9 +17,9 @@ PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data-source").resolve()
 OTHER_PATH = PATH.joinpath("other-datasets").resolve()
 
-heatmap_data = [[.5, 1, .5, 1, 1],
+heatmap_data = [[.5, 1, .5, .5, 0],
         [.5, 0, .5, 1, .5],
-        [.5, 1, .5, .5, 0]]
+        [.5, 0, .5, .5, 0]]
 
 debt_profile_data = pd.read_csv(DATA_PATH.joinpath('debt-profile-benchmark-and-data.csv'),low_memory=False, sep=";", header=0)
 debt_profile_data['y'] = 100*debt_profile_data['t-1']/debt_profile_data['Full']
@@ -250,10 +250,10 @@ debt_profile_vuln.add_trace(go.Scatter(x=[debt_profile_data.iloc[2]['x']-2,debt_
     ))
 
 debt_profile_vuln.add_annotation(x=debt_profile_data.iloc[3]['x']-2, y=max_point+40,
-            text="Upper Early Warning",showarrow=False)
+            text="Lower Early Warning",showarrow=False)
     
 debt_profile_vuln.add_trace(go.Scatter(x=[debt_profile_data.iloc[0]['x']-2,debt_profile_data.iloc[0]['x']-1,debt_profile_data.iloc[0]['x']], y=[max_point+40,]*3, mode='lines',
-        name='Lower early warning',
+        name='Upper early warning',
         line=dict(color='black', dash='dash', width=2),
         connectgaps=True, hovertemplate=''
     ))
