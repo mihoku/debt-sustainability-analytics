@@ -145,7 +145,7 @@ def stress_test(pb_ior,pb_size_shock):
     Baseline = baseline_stress_test[['Tahun','Nominal Debt (in percent of GDP)','Gross Financing Need (in percent of GDP)','Nominal Debt (in percent of Revenue)']]
     pb_interest_rate_shock=25
         
-    #preprocess pb shock
+    #@preprocess pb shock
     PB_Shock_Processor = baseline_stress_test
     
     #new PB based on 10Y stddev
@@ -185,9 +185,9 @@ def stress_test(pb_ior,pb_size_shock):
         
     PB_interest_rate_shock_txt = "Interest rate shock {} bps".format(PB_interest_rate_shock)
 
+    #@interest rate shock
     earliest = PB_Shock_Processor.loc[0]['Tahun']
     PB_Shock_Processor['interest rate shock'] = np.where(PB_Shock_Processor['Tahun']>earliest,PB_interest_rate_shock*(PB_Shock_Processor['Primary Balance (Percent of GDP)']-PB_Shock_Processor['Primary Balance After Shock'])*100,0)    
-    
     PB_interest_rate_shock_data = PB_Shock_Processor[['Tahun','interest rate shock']]
     
     #non interest revenue on PB shock
@@ -207,13 +207,13 @@ def stress_test(pb_ior,pb_size_shock):
     PB_Shock_Processor['Additional Financing Needs PB Shock'] = round(PB_Shock_Processor['Non-interest expenditure PB Shock difference']-PB_Shock_Processor['Non-interest revenue PB Shock difference'],3)
     additional_financing_needs_PB = PB_Shock_Processor[['Tahun','Additional Financing Needs PB Shock']]
     
-    #primary balance shock impact on financing
+    #@primary balance shock impact on financing
     input4_pb = input4
     Financing_Needs_Baseline = baseline_stress_test[['Tahun','Financing needs to be financed with new issuance']]
     input4_pb = pd.merge(input4_pb,Financing_Needs_Baseline,left_on=['Year'],right_on=['Tahun'], how='left')
     input4_pb['Percent_Instrument'] = input4_pb['Debt Issuance']/input4_pb['Financing needs to be financed with new issuance']
     
-    #add PB interest rate shock
+    #@add PB interest rate shock
     input4_pb = pd.merge(input4_pb,PB_interest_rate_shock_data,on=['Tahun'], how='left')
     input4_pb['Rate'] = input4_pb['Rate']+input4_pb['interest rate shock']/10000
     
@@ -223,7 +223,7 @@ def stress_test(pb_ior,pb_size_shock):
     input4_pb['Debt Issuance post shock'] = input4_pb['Percent_Instrument']*input4_pb['Total Financing Needs Post Shock']
     input4_pb['Interest Payment Amount post shock'] = np.where(input4_pb['Interest Payment Type']=='Annual',input4_pb['Rate']/100*input4_pb['Debt Issuance post shock'],input4_pb['Rate']/100*input4_pb['Debt Issuance post shock']/2)
     
-    #calculation of interest and repayment post PB shock
+    #@calculation of interest and repayment post PB shock
     PB_interest_and_repayment_schedule = pd.DataFrame()
     PB_year_series = []
     PB_interest_payment = []
@@ -269,11 +269,12 @@ def stress_test(pb_ior,pb_size_shock):
     PB_issuance = input4_pb[['Year','Debt Issuance post shock']].groupby(['Year']).sum()
     PB_interest_repayment_issuance_schedule = pd.merge(PB_interest_and_repayment_schedule,PB_issuance,left_on=['Tahun'],right_on=['Year'], how='left')
     
-    #join PB shock
+    #@join PB shock
     PB_Shock_Processor = pd.merge(PB_Shock_Processor,PB_interest_repayment_issuance_schedule, on=['Tahun'], how='left')
     PB_Shock_Processor['Total Gross Public Debt post shock'] = PB_Shock_Processor['Total Public Debt (t-1)']+PB_Shock_Processor['Debt Issuance post shock']
     PB_Shock_Processor['Gross Financing Needs post shock'] = PB_Shock_Processor['Recognition of implicit contingent liability']+PB_Shock_Processor['Non-interest expenditure PB Shock']+PB_Shock_Processor['Interest of Current Debt - Local Currency']+PB_Shock_Processor['Interest of Current Debt - Foreign Currency']+PB_Shock_Processor['Principal Payments - Local Currency']+PB_Shock_Processor['Principal Payments - Foreign Currency']+PB_Shock_Processor['New Debt Maturity Repayment post shock']+PB_Shock_Processor['New Debt Interest Payment post shock']-PB_Shock_Processor['Non-interest revenue PB Shock']
     
+    #@calculate total gross public debt new post shock
     PB_total_gross_public_debt = []
     PB_total_gross_public_debt_seed = PB_Shock_Processor.loc[0]['Total Gross Public Debt post shock']
     for i in np.arange(6):
@@ -285,6 +286,7 @@ def stress_test(pb_ior,pb_size_shock):
             PB_total_gross_public_debt_seed = gross_pd
     PB_Shock_Processor['Total Gross Public Debt post shock'] = PB_total_gross_public_debt
     
+    #copy data to dataframe
     Primary_Balance_Shock = PB_Shock_Processor
     Primary_Balance_Shock['Nominal Debt (in percent of GDP)'] = 100*Primary_Balance_Shock['Total Gross Public Debt post shock']/Primary_Balance_Shock['GDP at current prices (level)']
     Primary_Balance_Shock['Gross Financing Need (in percent of GDP)'] = 100*Primary_Balance_Shock['Gross Financing Needs post shock']/Primary_Balance_Shock['GDP at current prices (level)']
